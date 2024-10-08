@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Blockly Custom Block Example</title>
+    <script src="https://unpkg.com/blockly@11.1.1/blockly.min.js"></script>
+
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #blocklyDiv {
+        height: 480px;
+        width: 1200px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Blockly Custom Block Example</h1>
+
+    <!-- Blockly area -->
+    <div id="blocklyDiv"></div>
+
+    <!-- Run button -->
+    <button id="runCodeBtn">RUN</button>
+
+    <!-- Code output area -->
+    <pre id="generatedCode"></pre>
+
+    <script>
+        Blockly.Blocks['custom_block'] = {
+            init: function() {
+                this.appendValueInput("TEXT_INPUT")
+                    .setCheck("String")
+                    .appendField("Custom Block");
+                this.setOutput(true, 'String');
+                this.setColour(230);
+                this.setTooltip('This is a custom block');
+                this.setHelpUrl('');
+            }
+        };
+    
+        function custom_block_function(text) {
+            console.log("Received text: " + text);
+        };
+    
+        Blockly.JavaScript.forBlock['custom_block'] = function(block) {
+            var textInput = Blockly.JavaScript.valueToCode(block, 'TEXT_INPUT', Blockly.JavaScript.ORDER_ATOMIC);
+            var code = `custom_block_function(${textInput})`;
+            return code;
+        };
+    </script>
+
+    <!-- Blockly Workspace initialization -->
+    <script>
+        var workspace = Blockly.inject('blocklyDiv', {
+            toolbox: `
+            <xml id="toolbox" style="display: none">
+                <block type="text"></block>
+                <block type="custom_block"></block>
+            </xml>
+            `
+        });
+    
+        // Run button event listener to execute code
+        document.getElementById('runCodeBtn').addEventListener('click', function() {
+        
+        const code = Blockly.JavaScript.workspaceToCode(workspace);
+        document.getElementById('generatedCode').textContent = code;
+        try {
+          eval(code);  // Remove async and directly evaluate the code
+        } catch (e) {
+          console.error("Error evaluating generated code:", e);
+        }
+      });
+        
+    </script>
+  </body>
+</html>
